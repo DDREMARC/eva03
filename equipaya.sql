@@ -1,10 +1,12 @@
 -- ============================================================
 -- EquipaYa: script de la base de datos (parte a)
--- Probado en XAMPP (MariaDB 10.4). Se puede ejecutar varias veces.
+-- Solo usa lo visto en clase: CREATE DATABASE, USE, CREATE TABLE,
+-- PRIMARY KEY, FOREIGN KEY, AUTO_INCREMENT, DEFAULT, INSERT.
+-- Las validaciones (dias >= 1, tarifa > 0, documento de 8 u 11
+-- digitos) se hacen en Java antes de enviar los datos.
 -- ============================================================
 
-DROP DATABASE IF EXISTS equipaya;
-CREATE DATABASE equipaya CHARACTER SET utf8mb4;
+CREATE DATABASE IF NOT EXISTS equipaya;
 USE equipaya;
 
 -- ------------------------------------------------------------
@@ -13,30 +15,28 @@ USE equipaya;
 -- DNI puede empezar con cero. Al ser PK tiene indice: la consulta por
 -- documento (req. 5) no recorre toda la tabla.
 -- ------------------------------------------------------------
-CREATE TABLE cliente (
+CREATE TABLE IF NOT EXISTS cliente (
     documento VARCHAR(11)  NOT NULL,
     nombre    VARCHAR(100) NOT NULL,
     telefono  VARCHAR(15),
-    PRIMARY KEY (documento),
-    CHECK (CHAR_LENGTH(documento) IN (8, 11))
+    PRIMARY KEY (documento)
 );
 
 -- ------------------------------------------------------------
 -- EQUIPO
 -- PK = codigo (texto, el que usa el mostrador).
 -- tipo = texto que identifica la clase Java a crear (CAMARA,
--- ILUMINACION, AUDIO). No lleva CHECK con la lista de tipos a proposito:
--- agregar DRON el proximo ano no obliga a modificar la tabla (req. 6).
+-- ILUMINACION, AUDIO). No hay lista fija de tipos en la tabla: agregar
+-- DRON el proximo ano no obliga a modificarla (req. 6).
 -- disponible = TRUE/FALSE (req. 2).
 -- ------------------------------------------------------------
-CREATE TABLE equipo (
+CREATE TABLE IF NOT EXISTS equipo (
     codigo        VARCHAR(10)   NOT NULL,
     descripcion   VARCHAR(100)  NOT NULL,
     tarifa_diaria DECIMAL(10,2) NOT NULL,
     disponible    BOOLEAN       NOT NULL DEFAULT TRUE,
     tipo          VARCHAR(20)   NOT NULL,
-    PRIMARY KEY (codigo),
-    CHECK (tarifa_diaria > 0)
+    PRIMARY KEY (codigo)
 );
 
 -- ------------------------------------------------------------
@@ -47,7 +47,7 @@ CREATE TABLE equipo (
 -- monto = lo cobrado, calculado en Java con la regla de cada tipo.
 -- devuelto = FALSE mientras el equipo siga fuera (req. 4).
 -- ------------------------------------------------------------
-CREATE TABLE alquiler (
+CREATE TABLE IF NOT EXISTS alquiler (
     id_alquiler       INT           NOT NULL AUTO_INCREMENT,
     documento_cliente VARCHAR(11)   NOT NULL,
     codigo_equipo     VARCHAR(10)   NOT NULL,
@@ -57,9 +57,7 @@ CREATE TABLE alquiler (
     devuelto          BOOLEAN       NOT NULL DEFAULT FALSE,
     PRIMARY KEY (id_alquiler),
     FOREIGN KEY (documento_cliente) REFERENCES cliente (documento),
-    FOREIGN KEY (codigo_equipo)     REFERENCES equipo (codigo),
-    CHECK (dias >= 1),
-    CHECK (monto >= 0)
+    FOREIGN KEY (codigo_equipo)     REFERENCES equipo (codigo)
 );
 
 -- ------------------------------------------------------------

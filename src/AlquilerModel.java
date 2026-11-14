@@ -1,35 +1,69 @@
 public class AlquilerModel {
-    private int dni;
-    private String nombre;
-    private String telefono;
+    private int idAlquiler;
+    private String docCliente;
+    private String codEquipo;
+    private String fechaInicio;
+    private int dias;
+    private double monto;
+    private boolean devuelto;
 
-    public AlquilerModel(String telefono, String nombre, int dni) {
-        this.telefono = telefono;
-        this.nombre = nombre;
-        this.dni = dni;
+    public AlquilerModel(int idAlquiler, String docCliente, String codEquipo, String fechaInicio, int dias, double monto, boolean devuelto) {
+        this.idAlquiler = idAlquiler;
+        this.docCliente = docCliente;
+        this.codEquipo = codEquipo;
+        this.fechaInicio = fechaInicio;
+        this.dias = dias;
+        this.monto = monto;
+        this.devuelto = devuelto;
     }
 
-    public String getTelefono() {
-        return telefono;
+    public AlquilerModel(String docCliente, String codEquipo, int dias, double monto) {
+        this(0, docCliente, codEquipo, null, dias, monto, false);
     }
 
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
+    public int getIdAlquiler() {
+        return idAlquiler;
     }
 
-    public String getNombre() {
-        return nombre;
+    public void setIdAlquiler(int idAlquiler) {
+        this.idAlquiler = idAlquiler;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public String getDocCliente() {
+        return docCliente;
     }
 
-    public int getDni() {
-        return dni;
+    public String getCodEquipo() {
+        return codEquipo;
     }
 
-    public void setDni(int dni) {
-        this.dni = dni;
+    public String getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public int getDias() {
+        return dias;
+    }
+
+    public double getMonto() {
+        return monto;
+    }
+
+    public boolean isDevuelto() {
+        return devuelto;
+    }
+
+    public void setDevuelto(boolean devuelto) {
+        this.devuelto = devuelto;
+    }
+
+    public void mostrarInfo(){
+        System.out.println("ID: "+idAlquiler);
+        System.out.println("Doc Cliente: "+docCliente);
+        System.out.println("Cod Equipo: "+codEquipo);
+        System.out.println("Fecha inicio: "+fechaInicio);
+        System.out.println("Dias: "+dias);
+        System.out.println("Monto: "+monto);
+        System.out.println("Devuelto: "+devuelto);
     }
 }
