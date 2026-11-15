@@ -34,6 +34,7 @@ public class MainView {
             System.out.println("9. Facturado por tipo de equipo");
             System.out.println("10. Alquileres pendientes de devolucion");
             System.out.println("11. Consultar cliente por documento");
+            System.out.println("12. Eliminar cliente");
             System.out.println("0. Salir");
             opcion = leerEntero("Opcion: ");
 
@@ -60,20 +61,20 @@ public class MainView {
                     listarAlquileres();
                     break;
                 case 8:
-                    // POR HACER (Angel): req. 3
-                    System.out.println("Por implementar.");
+                    buscarClientePorNombre();
                     break;
                 case 9:
                     // POR HACER (Angel): req. 4a
                     System.out.println("Por implementar.");
                     break;
                 case 10:
-                    // POR HACER (Angel): req. 4b
-                    System.out.println("Por implementar.");
+                    listarPendientes();
                     break;
                 case 11:
-                    // POR HACER (Angel): req. 5
-                    System.out.println("Por implementar.");
+                    consultarClientePorDocumento();
+                    break;
+                case 12:
+                    eliminarCliente();
                     break;
                 case 0:
                     System.out.println("Saliendo...");
@@ -133,6 +134,64 @@ public class MainView {
             System.out.println("Datos invalidos: revisa el documento y el nombre.");
         } else {
             System.out.println("Error en la base de datos.");
+        }
+    }
+
+    // Req. 3
+    private void buscarClientePorNombre() {
+        System.out.print("Parte del nombre: ");
+        String texto = sc.nextLine();
+        ArrayList<ClientesModel> lista = clientesController.buscarPorNombre(texto);
+        if (lista == null) {
+            System.out.println("Escribe al menos una letra para buscar.");
+        } else if (lista.isEmpty()) {
+            System.out.println("No hay clientes con ese nombre.");
+        } else {
+            for (int i = 0; i < lista.size(); i++) {
+                lista.get(i).mostrarInfo();
+                System.out.println("-----");
+            }
+        }
+    }
+
+    // Req. 4b
+    private void listarPendientes() {
+        ArrayList<PendienteModel> lista = clientesController.listarPendientes();
+        if (lista.isEmpty()) {
+            System.out.println("No hay alquileres pendientes de devolucion.");
+        }
+        for (int i = 0; i < lista.size(); i++) {
+            lista.get(i).mostrarInfo();
+            System.out.println("-----");
+        }
+    }
+
+    // Req. 5
+    private void consultarClientePorDocumento() {
+        System.out.print("Documento: ");
+        String documento = sc.nextLine();
+        ClientesModel cliente = clientesController.buscarPorDocumento(documento);
+        if (cliente == null) {
+            System.out.println("No se encontro un cliente con ese documento.");
+        } else {
+            cliente.mostrarInfo();
+        }
+    }
+
+    private void eliminarCliente() {
+        System.out.print("Documento del cliente a eliminar: ");
+        String documento = sc.nextLine();
+        int resultado = clientesController.eliminar(documento);
+        if (resultado == 1) {
+            System.out.println("Cliente eliminado.");
+        } else if (resultado == 0) {
+            System.out.println("No existe un cliente con ese documento.");
+        } else if (resultado == -2) {
+            System.out.println("Documento invalido.");
+        } else if (resultado == -3) {
+            System.out.println("No se puede eliminar: el cliente tiene alquileres pendientes de devolucion.");
+        } else {
+            System.out.println("No se pudo eliminar (puede tener alquileres anteriores registrados).");
         }
     }
 

@@ -164,6 +164,110 @@ public class DatabaseConnector {
         return lista;
     }
 
+    // Req. 5: busca por la PK documento (ya tiene indice) usando la conexion abierta
+    public ClientesModel buscarClientePorDocumento(String documento) {
+        ClientesModel cliente = null;
+        try {
+            String sql = "SELECT documento, nombre, telefono FROM cliente WHERE documento = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, documento);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                cliente = new ClientesModel(
+                        rs.getString("documento"),
+                        rs.getString("nombre"),
+                        rs.getString("telefono"));
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException error) {
+            System.out.println(error.getMessage());
+        }
+        return cliente;
+    }
+
+    // Req. 3: el patron llega con %...% y con los comodines del usuario ya escapados con '!'
+    public ArrayList<ClientesModel> buscarClientesPorNombre(String patron) {
+        ArrayList<ClientesModel> lista = new ArrayList<>();
+        try {
+            String sql = "SELECT documento, nombre, telefono FROM cliente WHERE nombre LIKE ? ESCAPE '!'";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, patron);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                lista.add(new ClientesModel(
+                        rs.getString("documento"),
+                        rs.getString("nombre"),
+                        rs.getString("telefono")));
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException error) {
+            System.out.println(error.getMessage());
+        }
+        return lista;
+    }
+
+    // Cuantos alquileres sin devolver tiene el cliente (-1 si falla la base de datos)
+    public int contarPendientesDeCliente(String documento) {
+        int total = 0;
+        try {
+            String sql = "SELECT COUNT(*) AS total FROM alquiler WHERE documento_cliente = ? AND devuelto = FALSE";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, documento);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            total = rs.getInt("total");
+            rs.close();
+            ps.close();
+        } catch (SQLException error) {
+            return -1;
+        }
+        return total;
+    }
+
+    public int eliminarCliente(String documento) {
+        int filasAfectadas = 0;
+        try {
+            String sql = "DELETE FROM cliente WHERE documento = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, documento);
+            filasAfectadas = ps.executeUpdate();
+            ps.close();
+        } catch (SQLException error) {
+            return -1;
+        }
+        return filasAfectadas;
+    }
+
+    // Req. 4b: pendientes de devolucion con nombre del cliente y descripcion del equipo
+    public ArrayList<PendienteModel> listarPendientes() {
+        ArrayList<PendienteModel> lista = new ArrayList<>();
+        try {
+            String sql = "SELECT c.nombre, e.descripcion, a.fecha_inicio, a.dias, a.monto "
+                    + "FROM alquiler a "
+                    + "JOIN cliente c ON a.documento_cliente = c.documento "
+                    + "JOIN equipo e ON a.codigo_equipo = e.codigo "
+                    + "WHERE a.devuelto = FALSE "
+                    + "ORDER BY a.fecha_inicio";
+            Statement st = connection.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                lista.add(new PendienteModel(
+                        rs.getString("nombre"),
+                        rs.getString("descripcion"),
+                        rs.getString("fecha_inicio"),
+                        rs.getInt("dias"),
+                        rs.getDouble("monto")));
+            }
+            rs.close();
+            st.close();
+        } catch (SQLException error) {
+            System.out.println(error.getMessage());
+        }
+        return lista;
+    }
+
     // Equipos
     public ArrayList<EquipoModel> listarEquipos() {
         ArrayList<EquipoModel> lista = new ArrayList<>();
