@@ -1,4 +1,4 @@
-public abstract class EquipoModel {
+public abstract class EquipoModel implements Alquilable{
     private String codigo;
     private String descripcion;
     private double tarifaDiaria;
@@ -44,9 +44,6 @@ public abstract class EquipoModel {
     public String getTipo() {
         return tipo;
     }
-
-    // Cada tipo de equipo cobra distinto
-    public abstract double calcularMonto(int dias);
 
     public void mostrarInfo() {
         System.out.println("Codigo: " + codigo);

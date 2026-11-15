@@ -1,4 +1,5 @@
 public class EquipoCamara extends EquipoModel {
+    private static final double SEGURO = 0.15;
 
     public EquipoCamara(String codigo, String descripcion, double tarifaDiaria, boolean disponible) {
         super(codigo, descripcion, tarifaDiaria, disponible, "CAMARA");
@@ -6,7 +7,7 @@ public class EquipoCamara extends EquipoModel {
 
     @Override
     public double calcularMonto(int dias) {
-        // POR HACER (Angel): tarifa x dias, mas seguro obligatorio del 15 %
-        return 0;
+        double subtotal = getTarifaDiaria() * dias;
+        return subtotal + subtotal * SEGURO;
     }
 }

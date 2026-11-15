@@ -164,6 +164,28 @@ public class DatabaseConnector {
         return lista;
     }
 
+    public ArrayList<ClientesModel> buscarClientes(String texto) {
+        ArrayList<ClientesModel> lista = new ArrayList<>();
+        try {
+            String sql = "SELECT documento, nombre, telefono FROM cliente WHERE nombre LIKE ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, "%" + texto + "%");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ClientesModel cliente = new ClientesModel(
+                        rs.getString("documento"),
+                        rs.getString("nombre"),
+                        rs.getString("telefono"));
+                lista.add(cliente);
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException error) {
+            System.out.println(error.getMessage());
+        }
+        return lista;
+    }
+
     // Equipos
     public ArrayList<EquipoModel> listarEquipos() {
         ArrayList<EquipoModel> lista = new ArrayList<>();
@@ -179,14 +201,7 @@ public class DatabaseConnector {
                 String tipo = rs.getString("tipo");
 
                 // La columna tipo decide que clase de Java se crea
-                EquipoModel equipo = null;
-                if (tipo.equals("CAMARA")) {
-                    equipo = new EquipoCamara(codigo, descripcion, tarifa, disponible);
-                } else if (tipo.equals("ILUMINACION")) {
-                    equipo = new EquipoIluminacion(codigo, descripcion, tarifa, disponible);
-                } else if (tipo.equals("AUDIO")) {
-                    equipo = new EquipoAudio(codigo, descripcion, tarifa, disponible);
-                }
+                EquipoModel equipo = EquipoFabrica.crear(tipo, codigo, descripcion, tarifa, disponible);
                 if (equipo != null) {
                     lista.add(equipo);
                 }
@@ -199,6 +214,81 @@ public class DatabaseConnector {
         return lista;
     }
 
+    //Pendiente
+    public ArrayList<PendienteModel> listarPendientes() {
+        ArrayList<PendienteModel> lista = new ArrayList<>();
+        try {
+            String sql = "SELECT c.nombre, e.descripcion, a.dias, a.monto "
+                    + "FROM alquiler a "
+                    + "JOIN cliente c ON a.documento_cliente = c.documento "
+                    + "JOIN equipo e ON a.codigo_equipo = e.codigo "
+                    + "WHERE a.devuelto = FALSE";
+            Statement st = connection.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                PendienteModel pendienteModel = new PendienteModel(
+                        rs.getString("nombre"),
+                        rs.getString("descripcion"),
+                        rs.getInt("dias"),
+                        rs.getDouble("monto"));
+                lista.add(pendienteModel);
+            }
+            rs.close();
+            st.close();
+        } catch (SQLException error) {
+            System.out.println(error.getMessage());
+        }
+        return lista;
+    }
+
+    // Facturacion por tipo (req. 4a)
+    public ArrayList<FacturacionModel> listarFacturacion() {
+        ArrayList<FacturacionModel> lista = new ArrayList<>();
+        try {
+            String sql = "SELECT e.tipo, SUM(a.monto) AS total "
+                    + "FROM alquiler a "
+                    + "JOIN equipo e ON a.codigo_equipo = e.codigo "
+                    + "GROUP BY e.tipo "
+                    + "ORDER BY e.tipo";
+            Statement st = connection.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                FacturacionModel facturacion = new FacturacionModel(
+                        rs.getString("tipo"),
+                        rs.getDouble("total"));
+                lista.add(facturacion);
+            }
+            rs.close();
+            st.close();
+        } catch (SQLException error) {
+            System.out.println(error.getMessage());
+        }
+        return lista;
+    }
+
+    // Req. 5: devuelve el cliente con ese documento, o null si no existe
+    public ClientesModel buscarClientePorDocumento(String documento) {
+        ClientesModel cliente = null;
+        try {
+            String sql = "SELECT documento, nombre, telefono FROM cliente WHERE documento = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, documento);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                ClientesModel clientesModel = new ClientesModel(
+                        rs.getString("documento"),
+                        rs.getString("nombre"),
+                        rs.getString("telefono"));
+                cliente = clientesModel;
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException error) {
+            System.out.println(error.getMessage());
+        }
+        return cliente;
+    }
 
     public Connection getConnection() {
         return connection;
@@ -214,7 +304,4 @@ public class DatabaseConnector {
             }
         }
     }
-
-
-
 }

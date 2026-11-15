@@ -60,20 +60,16 @@ public class MainView {
                     listarAlquileres();
                     break;
                 case 8:
-                    // POR HACER (Angel): req. 3
-                    System.out.println("Por implementar.");
+                    buscarCliente();
                     break;
                 case 9:
-                    // POR HACER (Angel): req. 4a
-                    System.out.println("Por implementar.");
+                    listarFacturacion();
                     break;
                 case 10:
-                    // POR HACER (Angel): req. 4b
-                    System.out.println("Por implementar.");
+                    listarPendientes();
                     break;
                 case 11:
-                    // POR HACER (Angel): req. 5
-                    System.out.println("Por implementar.");
+                    consultarCliente();
                     break;
                 case 0:
                     System.out.println("Saliendo...");
@@ -102,6 +98,20 @@ public class MainView {
             System.out.println("Datos invalidos: revisa el documento y el nombre.");
         } else {
             System.out.println("No se pudo registrar (puede que ese documento ya exista).");
+        }
+    }
+
+    // Req. 3
+    private void buscarCliente() {
+        System.out.print("Parte del nombre: ");
+        String texto = sc.nextLine();
+        ArrayList<ClientesModel> lista = clientesController.buscarPorNombre(texto);
+        if (lista.isEmpty()) {
+            System.out.println("No se encontro el cliente.");
+        }
+        for (int i = 0; i < lista.size(); i++) {
+            lista.get(i).mostrarInfo();
+            System.out.println("-----");
         }
     }
 
@@ -158,9 +168,9 @@ public class MainView {
             return;
         }
 
-        EquipoModel equipo = equipoController.buscarPorCodigo(codigo);
+        Alquilable equipo = equipoController.buscarPorCodigo(codigo);
         if (equipo == null) {
-            System.out.println("No existe un equipo con ese codigo.");
+            System.out.println("No existe un equipo con ese código.");
             return;
         }
         double monto = equipo.calcularMonto(dias);
@@ -212,5 +222,41 @@ public class MainView {
         int numero = sc.nextInt();
         sc.nextLine();
         return numero;
+    }
+
+    private void listarPendientes() {
+        ArrayList<PendienteModel> lista = alquilerController.listarPendientes();
+        if (lista.isEmpty()) {
+            System.out.println("No hay pendientes.");
+        }
+        for (int i = 0; i < lista.size(); i++) {
+            lista.get(i).mostrarInfo();
+            System.out.println("-----");
+        }
+    }
+
+    // Req. 4a
+    private void listarFacturacion() {
+        ArrayList<FacturacionModel> lista = alquilerController.listarFacturacion();
+        if (lista.isEmpty()) {
+            System.out.println("No hay facturacion.");
+        }
+        for (int i = 0; i < lista.size(); i++) {
+            lista.get(i).mostrarInfoFacturacion();
+            System.out.println("-----");
+        }
+    }
+
+    // Req. 5
+    private void consultarCliente() {
+        System.out.print("Documento del cliente: ");
+        String documento = sc.nextLine();
+        ClientesModel clientesModel = clientesController.consultarPorDocumento(documento);
+
+        if (clientesModel == null) {
+            System.out.println("El cliente no existe.");
+        } else  {
+            clientesModel.mostrarInfo();
+        }
     }
 }

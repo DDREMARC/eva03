@@ -32,4 +32,13 @@ public class AlquilerController {
         }
         return 1;
     }
+
+    public ArrayList<PendienteModel> listarPendientes() {
+        return db.listarPendientes();
+    }
+
+    // Req. 4a
+    public ArrayList<FacturacionModel> listarFacturacion() {
+        return db.listarFacturacion();
+    }
 }
