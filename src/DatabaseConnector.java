@@ -27,12 +27,12 @@ public class DatabaseConnector {
             filasAfectadas = ps.executeUpdate();
             ps.close();
         } catch (SQLException error) {
+            System.out.println("Error en la base de datos: " + error.getMessage());
             return -1;
         }
         return filasAfectadas;
     }
 
-    // Alquiler
     public int insertarAlquiler(AlquilerModel alquilerModel) {
         int filasAfectadas = 0;
         try {
@@ -45,10 +45,29 @@ public class DatabaseConnector {
 
             filasAfectadas = ps.executeUpdate();
             ps.close();
-        } catch (SQLException error){
+        } catch (SQLException error) {
+            System.out.println("Error en la base de datos: " + error.getMessage());
             return -1;
         }
         return filasAfectadas;
+    }
+
+    public String buscarCodigoEquipoPendiente(int id) {
+        String codigo = null;
+        try {
+            String sql = "SELECT codigo_equipo FROM alquiler WHERE id_alquiler = ? AND devuelto = FALSE";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                codigo = rs.getString("codigo_equipo");
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException error) {
+            System.out.println("Error en la base de datos: " + error.getMessage());
+        }
+        return codigo;
     }
 
     public int marcarAlquilerDevuelto(int id) {
@@ -60,8 +79,24 @@ public class DatabaseConnector {
 
             filasAfectadas = ps.executeUpdate();
             ps.close();
-
         } catch (SQLException error) {
+            System.out.println("Error en la base de datos: " + error.getMessage());
+            return -1;
+        }
+        return filasAfectadas;
+    }
+
+    public int marcarAlquilerPendiente(int id) {
+        int filasAfectadas = 0;
+        try {
+            String sql = "UPDATE alquiler SET devuelto = FALSE WHERE id_alquiler = ? AND devuelto = TRUE";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+
+            filasAfectadas = ps.executeUpdate();
+            ps.close();
+        } catch (SQLException error) {
+            System.out.println("Error en la base de datos: " + error.getMessage());
             return -1;
         }
         return filasAfectadas;
@@ -75,8 +110,8 @@ public class DatabaseConnector {
             ps.setString(1, codigo);
             filasAfectadas = ps.executeUpdate();
             ps.close();
-
         } catch (SQLException error) {
+            System.out.println("Error en la base de datos: " + error.getMessage());
             return -1;
         }
         return filasAfectadas;
@@ -84,7 +119,6 @@ public class DatabaseConnector {
 
     public ArrayList<AlquilerModel> listarAlquileres() {
         ArrayList<AlquilerModel> lista = new ArrayList<>();
-
         try {
             String sql = "SELECT id_alquiler, documento_cliente, codigo_equipo, fecha_inicio, dias, monto, devuelto FROM alquiler";
             Statement st = connection.createStatement();
@@ -102,15 +136,12 @@ public class DatabaseConnector {
             }
             rs.close();
             st.close();
-
-
         } catch (SQLException error) {
             System.out.println(error.getMessage());
-            }
-        return lista;
         }
+        return lista;
+    }
 
-    // Clientes
     public int insertarCliente(ClientesModel cliente) {
         int filasAfectadas = 0;
         try {
@@ -122,6 +153,7 @@ public class DatabaseConnector {
             filasAfectadas = ps.executeUpdate();
             ps.close();
         } catch (SQLException error) {
+            System.out.println("Error en la base de datos: " + error.getMessage());
             return -1;
         }
         return filasAfectadas;
@@ -138,6 +170,7 @@ public class DatabaseConnector {
             filasAfectadas = ps.executeUpdate();
             ps.close();
         } catch (SQLException error) {
+            System.out.println("Error en la base de datos: " + error.getMessage());
             return -1;
         }
         return filasAfectadas;
@@ -186,7 +219,6 @@ public class DatabaseConnector {
         return lista;
     }
 
-    // Equipos
     public ArrayList<EquipoModel> listarEquipos() {
         ArrayList<EquipoModel> lista = new ArrayList<>();
         try {
@@ -194,14 +226,12 @@ public class DatabaseConnector {
             Statement st = connection.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
-                String codigo = rs.getString("codigo");
-                String descripcion = rs.getString("descripcion");
-                double tarifa = rs.getDouble("tarifa_diaria");
-                boolean disponible = rs.getBoolean("disponible");
-                String tipo = rs.getString("tipo");
-
-                // La columna tipo decide que clase de Java se crea
-                EquipoModel equipo = EquipoFabrica.crear(tipo, codigo, descripcion, tarifa, disponible);
+                EquipoModel equipo = EquipoFabrica.crear(
+                        rs.getString("tipo"),
+                        rs.getString("codigo"),
+                        rs.getString("descripcion"),
+                        rs.getDouble("tarifa_diaria"),
+                        rs.getBoolean("disponible"));
                 if (equipo != null) {
                     lista.add(equipo);
                 }
@@ -214,7 +244,29 @@ public class DatabaseConnector {
         return lista;
     }
 
-    //Pendiente
+    public EquipoModel buscarEquipoPorCodigo(String codigo) {
+        EquipoModel equipo = null;
+        try {
+            String sql = "SELECT codigo, descripcion, tarifa_diaria, disponible, tipo FROM equipo WHERE codigo = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, codigo);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                equipo = EquipoFabrica.crear(
+                        rs.getString("tipo"),
+                        rs.getString("codigo"),
+                        rs.getString("descripcion"),
+                        rs.getDouble("tarifa_diaria"),
+                        rs.getBoolean("disponible"));
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException error) {
+            System.out.println(error.getMessage());
+        }
+        return equipo;
+    }
+
     public ArrayList<PendienteModel> listarPendientes() {
         ArrayList<PendienteModel> lista = new ArrayList<>();
         try {
@@ -241,7 +293,6 @@ public class DatabaseConnector {
         return lista;
     }
 
-    // Facturacion por tipo (req. 4a)
     public ArrayList<FacturacionModel> listarFacturacion() {
         ArrayList<FacturacionModel> lista = new ArrayList<>();
         try {
@@ -266,7 +317,6 @@ public class DatabaseConnector {
         return lista;
     }
 
-    // Req. 5: devuelve el cliente con ese documento, o null si no existe
     public ClientesModel buscarClientePorDocumento(String documento) {
         ClientesModel cliente = null;
         try {
@@ -274,13 +324,11 @@ public class DatabaseConnector {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, documento);
             ResultSet rs = ps.executeQuery();
-
             if (rs.next()) {
-                ClientesModel clientesModel = new ClientesModel(
+                cliente = new ClientesModel(
                         rs.getString("documento"),
                         rs.getString("nombre"),
                         rs.getString("telefono"));
-                cliente = clientesModel;
             }
             rs.close();
             ps.close();
@@ -295,7 +343,7 @@ public class DatabaseConnector {
     }
 
     public void cerrarConexion() {
-        if (connection != null){
+        if (connection != null) {
             try {
                 connection.close();
                 connection = null;

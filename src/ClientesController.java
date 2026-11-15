@@ -4,14 +4,12 @@ import java.util.Map;
 
 public class ClientesController {
     private DatabaseConnector db;
-    // Req. 5: memoria de clientes ya consultados (clave = documento)
     private Map<String, ClientesModel> memoria = new HashMap<>();
 
     public ClientesController(DatabaseConnector db) {
         this.db = db;
     }
 
-    // Req. 5: consulta un cliente por documento sin ir a la base cada vez
     public ClientesModel consultarPorDocumento(String documento) {
         if (!documentoValido(documento)) {
             return null;
@@ -30,8 +28,6 @@ public class ClientesController {
         return db.listarClientes();
     }
 
-    // Devuelve 1 = registrado, -1 = error de base de datos (ej. documento repetido),
-    // -2 = datos invalidos
     public int registrar(String documento, String nombre, String telefono) {
         if (!documentoValido(documento) || nombre.isEmpty()) {
             return -2;
@@ -39,7 +35,6 @@ public class ClientesController {
         return db.insertarCliente(new ClientesModel(documento, nombre, telefono));
     }
 
-    // Devuelve 1 = actualizado, 0 = no existe ese documento, -1 = error, -2 = datos invalidos
     public int actualizar(String documento, String nombre, String telefono) {
         if (!documentoValido(documento) || nombre.isEmpty()) {
             return -2;
@@ -51,7 +46,6 @@ public class ClientesController {
         return resultado;
     }
 
-    // Req. 3: busca clientes por parte del nombre
     public ArrayList<ClientesModel> buscarPorNombre(String texto) {
         if (texto.isEmpty()) {
             return new ArrayList<>();
@@ -64,7 +58,6 @@ public class ClientesController {
         return db.buscarClientes(texto);
     }
 
-    // DNI de 8 digitos o RUC de 11, solo numeros
     private boolean documentoValido(String documento) {
         if (documento.length() != 8 && documento.length() != 11) {
             return false;

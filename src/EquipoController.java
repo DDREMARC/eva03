@@ -11,14 +11,7 @@ public class EquipoController {
         return db.listarEquipos();
     }
 
-    // Devuelve el equipo con ese codigo, o null si no existe
     public EquipoModel buscarPorCodigo(String codigo) {
-        ArrayList<EquipoModel> lista = db.listarEquipos();
-        for (int i = 0; i < lista.size(); i++) {
-            if (lista.get(i).getCodigo().equals(codigo)) {
-                return lista.get(i);
-            }
-        }
-        return null;
+        return db.buscarEquipoPorCodigo(codigo);
     }
 }

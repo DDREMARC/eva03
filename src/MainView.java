@@ -18,6 +18,16 @@ public class MainView {
 
     public void iniciar() {
         db.abrirConexion();
+        if (db.getConnection() == null) {
+            System.out.println("No se pudo conectar a la base de datos. Revisa que MySQL este encendido.");
+            sc.close();
+            return;
+        }
+
+        int corregidos = alquilerController.revisarConsistencia();
+        if (corregidos > 0) {
+            System.out.println("Se corrigio el estado de " + corregidos + " equipo(s) que no coincidia con sus alquileres.");
+        }
 
         int opcion = -1;
         while (opcion != 0) {
@@ -101,7 +111,6 @@ public class MainView {
         }
     }
 
-    // Req. 3
     private void buscarCliente() {
         System.out.print("Parte del nombre: ");
         String texto = sc.nextLine();
@@ -187,10 +196,8 @@ public class MainView {
 
     private void devolver() {
         int id = leerEntero("ID del alquiler: ");
-        System.out.print("Codigo del equipo: ");
-        String codigo = sc.nextLine();
 
-        int resultado = alquilerController.devolver(id, codigo);
+        int resultado = alquilerController.devolver(id);
         if (resultado == 1) {
             System.out.println("Devolucion registrada.");
         } else if (resultado == 0) {
@@ -211,7 +218,6 @@ public class MainView {
         }
     }
 
-    // Pide un numero hasta que el usuario escriba uno valido
     private int leerEntero(String mensaje) {
         System.out.print(mensaje);
         while (!sc.hasNextInt()) {
@@ -235,7 +241,6 @@ public class MainView {
         }
     }
 
-    // Req. 4a
     private void listarFacturacion() {
         ArrayList<FacturacionModel> lista = alquilerController.listarFacturacion();
         if (lista.isEmpty()) {
@@ -247,7 +252,6 @@ public class MainView {
         }
     }
 
-    // Req. 5
     private void consultarCliente() {
         System.out.print("Documento del cliente: ");
         String documento = sc.nextLine();

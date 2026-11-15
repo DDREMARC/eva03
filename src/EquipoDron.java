@@ -1,6 +1,6 @@
-public class EquipoDron extends EquipoModel{
-    public EquipoDron(String codigo, String descripcion, double tarifa, boolean disponible) {
-        super(codigo, descripcion, tarifa, disponible, "DRON");
+public class EquipoDron extends EquipoModel {
+    public EquipoDron(String codigo, String descripcion, double tarifaDiaria, boolean disponible) {
+        super(codigo, descripcion, tarifaDiaria, disponible, "DRON");
     }
 
     @Override
