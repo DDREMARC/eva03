@@ -110,6 +110,95 @@ public class DatabaseConnector {
         return lista;
         }
 
+    // Clientes
+    public int insertarCliente(ClientesModel cliente) {
+        int filasAfectadas = 0;
+        try {
+            String sql = "INSERT INTO cliente (documento, nombre, telefono) VALUES (?, ?, ?)";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, cliente.getDocumento());
+            ps.setString(2, cliente.getNombre());
+            ps.setString(3, cliente.getTelefono());
+            filasAfectadas = ps.executeUpdate();
+            ps.close();
+        } catch (SQLException error) {
+            return -1;
+        }
+        return filasAfectadas;
+    }
+
+    public int actualizarCliente(ClientesModel cliente) {
+        int filasAfectadas = 0;
+        try {
+            String sql = "UPDATE cliente SET nombre = ?, telefono = ? WHERE documento = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, cliente.getNombre());
+            ps.setString(2, cliente.getTelefono());
+            ps.setString(3, cliente.getDocumento());
+            filasAfectadas = ps.executeUpdate();
+            ps.close();
+        } catch (SQLException error) {
+            return -1;
+        }
+        return filasAfectadas;
+    }
+
+    public ArrayList<ClientesModel> listarClientes() {
+        ArrayList<ClientesModel> lista = new ArrayList<>();
+        try {
+            String sql = "SELECT documento, nombre, telefono FROM cliente";
+            Statement st = connection.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                ClientesModel cliente = new ClientesModel(
+                        rs.getString("documento"),
+                        rs.getString("nombre"),
+                        rs.getString("telefono"));
+                lista.add(cliente);
+            }
+            rs.close();
+            st.close();
+        } catch (SQLException error) {
+            System.out.println(error.getMessage());
+        }
+        return lista;
+    }
+
+    // Equipos
+    public ArrayList<EquipoModel> listarEquipos() {
+        ArrayList<EquipoModel> lista = new ArrayList<>();
+        try {
+            String sql = "SELECT codigo, descripcion, tarifa_diaria, disponible, tipo FROM equipo";
+            Statement st = connection.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                String codigo = rs.getString("codigo");
+                String descripcion = rs.getString("descripcion");
+                double tarifa = rs.getDouble("tarifa_diaria");
+                boolean disponible = rs.getBoolean("disponible");
+                String tipo = rs.getString("tipo");
+
+                // La columna tipo decide que clase de Java se crea
+                EquipoModel equipo = null;
+                if (tipo.equals("CAMARA")) {
+                    equipo = new EquipoCamara(codigo, descripcion, tarifa, disponible);
+                } else if (tipo.equals("ILUMINACION")) {
+                    equipo = new EquipoIluminacion(codigo, descripcion, tarifa, disponible);
+                } else if (tipo.equals("AUDIO")) {
+                    equipo = new EquipoAudio(codigo, descripcion, tarifa, disponible);
+                }
+                if (equipo != null) {
+                    lista.add(equipo);
+                }
+            }
+            rs.close();
+            st.close();
+        } catch (SQLException error) {
+            System.out.println(error.getMessage());
+        }
+        return lista;
+    }
+
 
     public Connection getConnection() {
         return connection;

@@ -1,43 +1,58 @@
 public abstract class EquipoModel {
-    protected String codigo;
-    protected String descripcion;
-    protected float tarifa;
-    private boolean estado;
-    protected int dias;
+    private String codigo;
+    private String descripcion;
+    private double tarifaDiaria;
+    private boolean disponible;
+    private String tipo;
 
-    public EquipoModel(String codigo, String descripcion, float tarifa, boolean estado) {
+    public EquipoModel(String codigo, String descripcion, double tarifaDiaria, boolean disponible, String tipo) {
         this.codigo = codigo;
         this.descripcion = descripcion;
-        this.tarifa = tarifa;
-        this.estado = estado;
+        this.tarifaDiaria = tarifaDiaria;
+        this.disponible = disponible;
+        this.tipo = tipo;
     }
 
     public String getCodigo() {
         return codigo;
     }
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
+
     public String getDescripcion() {
         return descripcion;
     }
+
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-    public float getTarifa() {
-        return tarifa;
-    }
-    public void setTarifa(float tarifa) {
-        this.tarifa = tarifa;
-    }
-    public boolean isEstado() {
-        return estado;
-    }
-    public void setEstado(boolean estado) {
-        this.estado = estado;
-    }
-    public int getDias() {return dias;}
-    public void setDias(int dias) {this.dias = dias;}
 
-    public abstract void TarifaPorDia(float tarifa);
+    public double getTarifaDiaria() {
+        return tarifaDiaria;
+    }
+
+    public void setTarifaDiaria(double tarifaDiaria) {
+        this.tarifaDiaria = tarifaDiaria;
+    }
+
+    public boolean isDisponible() {
+        return disponible;
+    }
+
+    public void setDisponible(boolean disponible) {
+        this.disponible = disponible;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    // Cada tipo de equipo cobra distinto
+    public abstract double calcularMonto(int dias);
+
+    public void mostrarInfo() {
+        System.out.println("Codigo: " + codigo);
+        System.out.println("Descripcion: " + descripcion);
+        System.out.println("Tipo: " + tipo);
+        System.out.println("Tarifa diaria: " + tarifaDiaria);
+        System.out.println("Disponible: " + disponible);
+    }
 }

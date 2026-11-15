@@ -1,14 +1,12 @@
-public class EquipoCamara extends EquipoModel{
-    private float seguroObligatorio;
+public class EquipoCamara extends EquipoModel {
 
-    public EquipoCamara(String codigo, String descripcion, float tarifa, boolean estado, float seguroObligatorio) {
-        super(codigo, descripcion, tarifa, estado);
-        this.seguroObligatorio = seguroObligatorio;
+    public EquipoCamara(String codigo, String descripcion, double tarifaDiaria, boolean disponible) {
+        super(codigo, descripcion, tarifaDiaria, disponible, "CAMARA");
     }
 
     @Override
-    public void TarifaPorDia(float tarifaPorDia) {
-        float tarifaPorDia = (tarifa * dias) + 0.15f;
-
+    public double calcularMonto(int dias) {
+        // POR HACER (Angel): tarifa x dias, mas seguro obligatorio del 15 %
+        return 0;
     }
 }
